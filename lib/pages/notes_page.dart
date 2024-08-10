@@ -4,6 +4,7 @@ import 'package:noto/components/drawer.dart';
 import 'package:noto/components/note_tile.dart';
 import 'package:noto/models/note.dart';
 import 'package:noto/models/note_database.dart';
+import 'package:noto/pages/note_edit_page.dart'; // Import the new NoteEditPage
 import 'package:provider/provider.dart';
 
 class NotesPage extends StatefulWidget {
@@ -14,18 +15,14 @@ class NotesPage extends StatefulWidget {
 }
 
 class _NotesPageState extends State<NotesPage> {
-  //text controller to access what the user typed
   final textController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
-
-    // on app startup, fetch existing notes
     readNotes();
   }
 
-  // Create a note
   void createNote() {
     showDialog(
       context: context,
@@ -35,16 +32,10 @@ class _NotesPageState extends State<NotesPage> {
           controller: textController,
         ),
         actions: [
-          // create button
           MaterialButton(
             onPressed: () {
-              // add to db
               context.read<NoteDatabase>().addNote(textController.text);
-
-              // clear controller
               textController.clear();
-
-              // pop dialog box
               Navigator.pop(context);
             },
             child: const Text('Create'),
@@ -54,9 +45,12 @@ class _NotesPageState extends State<NotesPage> {
     );
   }
 
-  // read notes
   void readNotes() {
     context.read<NoteDatabase>().fetchNotes();
+  }
+
+  void deleteNote(int id) {
+    context.read<NoteDatabase>().deleteNote(id);
   }
 
   // update a note
@@ -76,30 +70,29 @@ class _NotesPageState extends State<NotesPage> {
                     context
                         .read<NoteDatabase>()
                         .updateNote(note.id, textController.text);
-
                     // clear controller
                     textController.clear();
-
                     // pop dialog box
                     Navigator.pop(context);
                   },
                   child: const Text("Update"),
-                )
+                ),
               ],
             ));
   }
 
-  // delete a note
-  void deleteNote(int id) {
-    context.read<NoteDatabase>().deleteNote(id);
+  void _navigateToEditPage(Note note) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => NoteEditPage(note: note),
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    // note database
     final noteDatabase = context.watch<NoteDatabase>();
-
-    // current notes
     List<Note> currentNotes = noteDatabase.currentNotes;
 
     return Scaffold(
@@ -113,7 +106,6 @@ class _NotesPageState extends State<NotesPage> {
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Heading
           Padding(
             padding: const EdgeInsets.only(left: 25.0),
             child: Text('Noto',
@@ -122,23 +114,22 @@ class _NotesPageState extends State<NotesPage> {
                   color: Theme.of(context).colorScheme.inversePrimary,
                 )),
           ),
-
-          //List of Notes
           Expanded(
             child: ListView.builder(
-                itemCount: currentNotes.length,
-                itemBuilder: (context, index) {
-                  // get individual note
-                  final note = currentNotes[index];
-
-                  // list tile UI
-                  return NoteTile(
+              itemCount: currentNotes.length,
+              itemBuilder: (context, index) {
+                final note = currentNotes[index];
+                return GestureDetector(
+                  onTap: () => _navigateToEditPage(note),
+                  child: NoteTile(
                     text: note.text,
                     onEditPressed: () => updateNote(note),
                     onDeletePressed: () => deleteNote(note.id),
-                  );
-                }),
-          )
+                  ),
+                );
+              },
+            ),
+          ),
         ],
       ),
       floatingActionButton: FloatingActionButton(

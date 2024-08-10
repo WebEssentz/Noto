@@ -1,5 +1,5 @@
 name: noto
-description: "A new Flutter project."
+description: "Noto is a modern, intuitive note-taking app designed for simplicity and efficiency. Whether you're jotting down ideas, organizing tasks, or keeping track of important information, Noto offers a streamlined user experience that puts your notes front and center. With features like rich text editing, color-coded notes, pinning, and dark mode, Noto is built to adapt to your personal style and needs."
 publish_to: 'none'
 version: 0.1.0
 
@@ -9,6 +9,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  flutter_quill: ^10.1.9
   google_fonts: ^6.2.1
   isar: ^3.1.0+1
   isar_flutter_libs: ^3.1.0+1
